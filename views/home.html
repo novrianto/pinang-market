@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MarketPinang — Home</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background: white;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-logo { font-size: 22px; font-weight: 700; color: #2563eb; }
+
+    .navbar-menu { display: flex; gap: 12px; align-items: center; }
+
+    .navbar-menu button {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-upload {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-upload:hover { background: #1d4ed8; }
+
+    .btn-myposts {
+      background: #f1f5f9;
+      color: #374151;
+    }
+
+    .btn-myposts:hover { background: #e2e8f0; }
+
+    .btn-chat {
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0 !important;
+    }
+
+    .btn-profile {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
+    .btn-logout {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .user-info {
+      font-size: 13px;
+      color: #64748b;
+      margin-right: 4px;
+    }
+
+    /* SEARCH & FILTER */
+    .search-section {
+      background: white;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 11px 16px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-bar input:focus { border-color: #2563eb; }
+
+    .search-bar button {
+      padding: 11px 20px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .kategori-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      max-width: 700px;
+      margin: 12px auto 0;
+    }
+
+    .kategori-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid #e2e8f0;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      color: #374151;
+      transition: all 0.2s;
+    }
+
+    .kategori-btn.active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    /* GRID POSTINGAN */
+    .main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 16px;
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .post-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .post-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    .post-foto {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #f1f5f9;
+    }
+
+    .post-foto-placeholder {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #e0e7ff, #f0f9ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+
+    .post-info { padding: 14px; }
+
+    .post-kategori {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #2563eb;
+      background: #eff6ff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .post-judul {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .post-harga {
+      font-size: 16px;
+      font-weight: 700;
+      color: #16a34a;
+      margin-bottom: 6px;
+    }
+
+    .post-penjual {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+    }
+
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #94a3b8;
+    }
+
+    /* MODAL UPLOAD */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      margin: 16px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 { font-size: 18px; color: #1e293b; }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #64748b;
+      line-height: 1;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 5px;
+    }
+
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: #2563eb;
+    }
+
+    .field textarea { resize: vertical; min-height: 80px; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .btn-submit:disabled { background: #93c5fd; cursor: not-allowed; }
+
+    .alert {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .alert.error { background: #fef2f2; color: #dc2626; }
+    .alert.success { background: #f0fdf4; color: #16a34a; }
+
+    /* MODAL DETAIL */
+    .detail-foto {
+      width: 100%;
+      max-height: 280px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .detail-harga {
+      font-size: 24px;
+      font-weight: 700;
+      color: #16a34a;
+      margin: 8px 0;
+    }
+
+    .detail-desc {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 12px 0;
+    }
+
+    .btn-hubungi {
+      width: 100%;
+      padding: 12px;
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    .btn-hubungi:hover { background: #15803d; }
+  </style>
+</head>
+<body>
+<script src="/js/auth.js"></script>
+<script>cekLogin();</script>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-logo">🛍️ MarketPinang</div>
+  <div class="navbar-menu">
+    <span class="user-info">Halo, <strong id="nama-user"></strong></span>
+    <button class="btn-myposts" onclick="lihatPostinganSaya()">📦 Postingan Saya</button>
+    <button class="btn-upload" onclick="bukaModalUpload()">+ Jual Sekarang</button>
+    <button class="btn-profile" onclick="window.location.href='/views/profile.html'">👤 Profil</button>
+    <button class="btn-chat" onclick="window.location.href='/views/chat.html'">💬 Chat</button>
+    <button class="btn-logout" onclick="logout()">Keluar</button>
+  </div>
+</nav>
+
+<!-- SEARCH -->
+<div class="search-section">
+  <div class="search-bar">
+    <input type="text" id="input-search" placeholder="Cari barang...">
+    <button onclick="cariPost()">🔍 Cari</button>
+  </div>
+  <div class="kategori-list">
+    <button class="kategori-btn active" onclick="filterKategori('semua', this)">Semua</button>
+    <button class="kategori-btn" onclick="filterKategori('elektronik', this)">📱 Elektronik</button>
+    <button class="kategori-btn" onclick="filterKategori('fashion', this)">👗 Fashion</button>
+    <button class="kategori-btn" onclick="filterKategori('kendaraan', this)">🚗 Kendaraan</button>
+    <button class="kategori-btn" onclick="filterKategori('rumah', this)">🏠 Rumah & Taman</button>
+    <button class="kategori-btn" onclick="filterKategori('hobi', this)">🎮 Hobi</button>
+    <button class="kategori-btn" onclick="filterKategori('lainnya', this)">📦 Lainnya</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="section-title" id="section-title">Semua Postingan</div>
+  <div id="posts-container" class="posts-grid">
+    <div class="loading">Memuat postingan...</div>
+  </div>
+</div>
+
+<!-- MODAL UPLOAD -->
+<div class="modal-overlay" id="modal-upload">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📦 Jual Barang</h2>
+      <button class="modal-close" onclick="tutupModal('modal-upload')">✕</button>
+    </div>
+    <div id="alert-upload" class="alert"></div>
+    <div class="field">
+      <label>Judul Iklan</label>
+      <input type="text" id="up-judul" placeholder="Contoh: iPhone 13 Pro 256GB">
+    </div>
+    <div class="field">
+      <label>Kategori</label>
+      <select id="up-kategori">
+        <option value="">-- Pilih Kategori --</option>
+        <option value="elektronik">📱 Elektronik</option>
+        <option value="fashion">👗 Fashion</option>
+        <option value="kendaraan">🚗 Kendaraan</option>
+        <option value="rumah">🏠 Rumah & Taman</option>
+        <option value="hobi">🎮 Hobi</option>
+        <option value="lainnya">📦 Lainnya</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Harga (Rp)</label>
+      <input type="number" id="up-harga" placeholder="Contoh: 5000000">
+    </div>
+    <div class="field">
+      <label>Deskripsi</label>
+      <textarea id="up-deskripsi" placeholder="Jelaskan kondisi, spesifikasi, dll..."></textarea>
+    </div>
+    <div class="field">
+      <label>Foto Barang (opsional, max 5MB)</label>
+      <input type="file" id="up-foto" accept="image/*">
+    </div>
+    <button class="btn-submit" id="btn-submit-upload" onclick="uploadPost()">Kirim untuk Direview</button>
+  </div>
+</div>
+
+<!-- MODAL DETAIL POSTINGAN -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="detail-judul"></h2>
+      <button class="modal-close" onclick="tutupModal('modal-detail')">✕</button>
+    </div>
+    <div id="detail-foto-container"></div>
+    <div class="post-kategori" id="detail-kategori"></div>
+    <div class="detail-harga" id="detail-harga"></div>
+    <div class="detail-desc" id="detail-desc"></div>
+    <div style="font-size:13px;color:#64748b" id="detail-penjual"></div>
+    <button class="btn-hubungi" id="btn-hubungi">💬 Hubungi Penjual</button>
+  </div>
+</div>
+
+<!-- MODAL POSTINGAN SAYA -->
+<div class="modal-overlay" id="modal-myposts">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📦 Postingan Saya</h2>
+      <button class="modal-close" onclick="tutupModal('modal-myposts')">✕</button>
+    </div>
+    <div id="myposts-container"></div>
+  </div>
+</div>
+
+<script>
+  // Cek login
+  const token = localStorage.getItem('token');
+  const namaUser = localStorage.getItem('nama');
+  const userId = localStorage.getItem('userId');
+
+  if (!token) window.location.href = '/views/auth.html';
+  document.getElementById('nama-user').textContent = namaUser;
+
+  let kategoriAktif = 'semua';
+  let searchAktif = '';
+
+  // Load postingan
+  async function loadPosts() {
+    const container = document.getElementById('posts-container');
+    container.innerHTML = '<div class="loading">Memuat postingan...</div>';
+
+    let url = `/api/posts?kategori=${kategoriAktif}`;
+    if (searchAktif) url += `&search=${encodeURIComponent(searchAktif)}`;
+
+    try {
+      const res = await fetch(url);
+      const posts = await res.json();
+
+      if (posts.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <div class="icon">🔍</div>
+            <div>Belum ada postingan</div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = posts.map(post => `
+        <div class="post-card" onclick="lihatDetail(${post.id})">
+          ${post.foto
+            ? `<img class="post-foto" src="${post.foto}" alt="${post.judul}">`
+            : `<div class="post-foto-placeholder">📦</div>`
+          }
+          <div class="post-info">
+            <div class="post-kategori">${post.kategori}</div>
+            <div class="post-judul">${post.judul}</div>
+            <div class="post-harga">Rp ${Number(post.harga).toLocaleString('id-ID')}</div>
+            <div class="post-penjual">👤 ${post.nama_penjual}</div>
+          </div>
+        </div>
+      `).join('');
+    } catch {
+      container.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div>Gagal memuat postingan</div></div>';
+    }
+  }
+
+  // Filter kategori
+  function filterKategori(kat, el) {
+    kategoriAktif = kat;
+    document.querySelectorAll('.kategori-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('section-title').textContent =
+      kat === 'semua' ? 'Semua Postingan' : `Kategori: ${kat}`;
+    loadPosts();
+  }
+
+  // Search
+  function cariPost() {
+    searchAktif = document.getElementById('input-search').value;
+    loadPosts();
+  }
+
+  document.getElementById('input-search').addEventListener('keydown', e => {
+    if (e.key === 'Enter') cariPost();
+  });
+
+  // Lihat detail
+  async function lihatDetail(id) {
+    const res = await fetch(`/api/posts/${id}`);
+    const post = await res.json();
+
+    document.getElementById('detail-judul').textContent = post.judul;
+    document.getElementById('detail-kategori').textContent = post.kategori;
+    document.getElementById('detail-harga').textContent = `Rp ${Number(post.harga).toLocaleString('id-ID')}`;
+    document.getElementById('detail-desc').textContent = post.deskripsi;
+    document.getElementById('detail-penjual').textContent = `👤 Dijual oleh: ${post.nama_penjual}`;
+
+    const fotoContainer = document.getElementById('detail-foto-container');
+    fotoContainer.innerHTML = post.foto
+      ? `<img class="detail-foto" src="${post.foto}">`
+      : '';
+
+    const btnHubungi = document.getElementById('btn-hubungi');
+if (post.penjual_id == userId) {
+  btnHubungi.style.display = 'none';
+} else {
+  btnHubungi.style.display = 'block';
+  btnHubungi.onclick = async () => {
+    // Buat chat thread untuk post ini
+    const res = await fetch('/api/chat/thread', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        post_id: post.id,
+        user2_id: post.penjual_id
+      })
+    });
+    const thread = await res.json();
+    
+    // Simpan ke localStorage
+    localStorage.setItem('chat_dengan', post.penjual_id);
+    localStorage.setItem('chat_nama', post.nama_penjual);
+    localStorage.setItem('chat_thread_id', thread.id);
+    localStorage.setItem('chat_post_id', post.id);
+    localStorage.setItem('chat_post_judul', post.judul);
+    localStorage.setItem('chat_post_harga', post.harga);
+    localStorage.setItem('chat_post_foto', post.foto || '');
+    localStorage.setItem('chat_post_deskripsi', post.deskripsi);
+    
+    window.location.href = '/views/chat.html';
+  };
+}
+
+    bukaModal('modal-detail');
+  }
+
+  // Postingan saya
+  async function lihatPostinganSaya() {
+    const res = await fetch('/api/posts/saya', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const posts = await res.json();
+    const container = document.getElementById('myposts-container');
+
+    if (posts.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">📦</div><div>Belum ada postingan</div></div>';
+    } else {
+      container.innerHTML = posts.map(post => `
+        <div style="padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div style="font-weight:600;color:#1e293b">${post.judul}</div>
+              <div style="font-size:13px;color:#64748b;margin-top:2px">Rp ${Number(post.harga).toLocaleString('id-ID')}</div>
+            </div>
+            <span style="font-size:12px;padding:3px 10px;border-radius:20px;font-weight:500;
+              background:${post.status==='approved'?'#f0fdf4':post.status==='pending'?'#fffbeb':'#fef2f2'};
+              color:${post.status==='approved'?'#16a34a':post.status==='pending'?'#d97706':'#dc2626'}">
+              ${post.status==='approved'?'✅ Aktif':post.status==='pending'?'⏳ Menunggu':'❌ Ditolak'}
+            </span>
+          </div>
+          ${post.status==='rejected' && post.alasan_reject
+            ? `<div style="font-size:12px;color:#dc2626;margin-top:6px">Alasan: ${post.alasan_reject}</div>`
+            : ''}
+          <button onclick="hapusPost(${post.id})" style="margin-top:10px;padding:6px 14px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;cursor:pointer;font-size:13px">
+            Hapus
+          </button>
+        </div>
+      `).join('');
+    }
+
+    bukaModal('modal-myposts');
+  }
+
+  // Hapus post
+  async function hapusPost(id) {
+    if (!confirm('Yakin mau hapus postingan ini?')) return;
+    const res = await fetch(`/api/posts/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.ok) {
+      lihatPostinganSaya();
+      loadPosts();
+    }
+  }
+
+  // Upload post
+  async function uploadPost() {
+    const judul = document.getElementById('up-judul').value;
+    const kategori = document.getElementById('up-kategori').value;
+    const harga = document.getElementById('up-harga').value;
+    const deskripsi = document.getElementById('up-deskripsi').value;
+    const foto = document.getElementById('up-foto').files[0];
+
+    const formData = new FormData();
+    formData.append('judul', judul);
+    formData.append('kategori', kategori);
+    formData.append('harga', harga);
+    formData.append('deskripsi', deskripsi);
+    if (foto) formData.append('foto', foto);
+
+    const btn = document.getElementById('btn-submit-upload');
+    btn.disabled = true;
+    btn.textContent = 'Mengirim...';
+
+    try {
+      const res = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showAlert('alert-upload', data.error, 'error');
+      } else {
+        showAlert('alert-upload', '✅ Postingan dikirim! Menunggu persetujuan admin.', 'success');
+        setTimeout(() => tutupModal('modal-upload'), 1500);
+      }
+    } catch {
+      showAlert('alert-upload', 'Gagal terhubung ke server', 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Kirim untuk Direview';
+  }
+
+  // Helpers
+  function bukaModal(id) { document.getElementById(id).classList.add('show'); }
+  function tutupModal(id) { document.getElementById(id).classList.remove('show'); }
+  function bukaModalUpload() { bukaModal('modal-upload'); }
+
+  function showAlert(id, pesan, tipe) {
+    const el = document.getElementById(id);
+    el.textContent = pesan;
+    el.className = `alert ${tipe}`;
+    el.style.display = 'block';
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = '/views/auth.html';
+  }
+
+  // Tutup modal kalau klik di luar
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('show');
+    });
+  });
+
+  // Load pertama kali
+  loadPosts();
+</script>
+</body>
+</html>
