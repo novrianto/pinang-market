@@ -46,6 +46,7 @@
     .chat-wrap {
       display: flex;
       flex: 1;
+      min-height: 0;
       overflow: hidden;
       max-width: 1100px;
       width: 100%;
@@ -161,6 +162,7 @@
     /* AREA CHAT */
     .chat-area {
       flex: 1;
+      min-height: 0;
       background: white;
       border-radius: 14px;
       border: 0.5px solid #e2e8f0;
@@ -213,6 +215,9 @@
 
     /* Container utama pesan */
 #messages-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -307,6 +312,7 @@
 
     /* INPUT PESAN */
     .chat-input-wrap {
+      flex-shrink: 0;
       padding: 12px 16px;
       border-top: 1px solid #f1f5f9;
       display: flex;
@@ -654,9 +660,15 @@
   });
 
   // Terima negosiasi
-  socket.on('new_negotiation', async (nego) => {
-    if (chatThreadAktif === nego.chat_id) {
+  socket.on('negotiation_received', async (data) => {
+    console.log('Negotiation received:', data);
+    if (chatThreadAktif === data.chat_id) {
       await loadNegotiasi();
+      // Notify user
+      const audio = new Audio();
+      audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj==';
+      audio.play().catch(() => {});
+      alert('⚠️ Ada penawaran harga baru dari ' + namaLawanAktif);
     }
   });
 
@@ -817,6 +829,12 @@
 
     await loadRiwayatChat();
     await loadNegotiasi();
+
+    if (window.negoInterval) clearInterval(window.negoInterval);
+        window.negoInterval = setInterval(async () => {
+      await loadNegotiasi();
+    }, 3000);
+
     scrollBawah();
     loadDaftarChat();
     document.getElementById('input-pesan')?.focus();
@@ -885,7 +903,6 @@
       return;
     }
 
-    const sudahBuat = nego.dibuat_oleh === userId;
     const bukan = nego.dibuat_oleh !== userId;
 
     container.innerHTML = `
@@ -898,7 +915,7 @@
               <button class="btn-nego-mini btn-setuju" onclick="approveNego(${nego.id})">✓ Setuju</button>
               <button class="btn-nego-mini btn-tolak" onclick="rejectNego(${nego.id})">✗ Tolak</button>
             </div>
-          ` : '<span style="color:#d97706">Menunggu respons...</span>'}
+          ` : `<span style="color:#d97706;font-size:12px">⏳ Menunggu respons...</span>`}
         </div>
       </div>
     `;
@@ -927,15 +944,35 @@
     });
 
     if (res.ok) {
+      const nego = await res.json();
       document.getElementById('input-nego-harga').value = '';
       tutupModal('modal-nego');
       await loadNegotiasi();
-      // TAMBAH INI - emit socket
-      socket.emit('private_message', {
-        sender_id: userId,
-        receiver_id: lawanAktif,
-        isi: `💰 Penawaran negosiasi harga Rp ${Number(harga).toLocaleString('id-ID')}`
+      
+      // EMIT KE SOCKET DENGAN BENAR
+      socket.emit('new_negotiation', {
+        chat_id: chatThreadAktif,
+        user1_id: userId,
+        user2_id: lawanAktif,
+        harga: harga,
+        nama: namaUser
       });
+
+      // Kirim pesan ke chat
+      await fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          receiver_id: lawanAktif, 
+          isi: `💰 Mengajukan negosiasi: Rp ${Number(harga).toLocaleString('id-ID')}`
+        })
+      });
+
+      loadDaftarChat();
+      alert('✓ Penawaran harga dikirim. Tunggu konfirmasi dari pembeli...');
     }
   }
 

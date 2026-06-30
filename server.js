@@ -31,9 +31,18 @@ io.on('connection', (socket) => {
   });
 
   socket.on('private_message', (data) => {
-    io.to(`user_${data.receiver_id}`).emit('new_message', data);
-    io.to(`user_${data.sender_id}`).emit('new_message', data);
-  });
+  // Kirim ke penerima
+  io.to(`user_${data.receiver_id}`).emit('new_message', data);
+  // Kirim balik ke pengirim juga
+  io.to(`user_${data.sender_id}`).emit('new_message', data);
+});
+
+// Emit negotiation
+socket.on('new_negotiation', (data) => {
+  console.log('Negotiation event:', data);
+  io.to(`user_${data.user2_id}`).emit('negotiation_received', data);
+  io.to(`user_${data.user1_id}`).emit('negotiation_received', data);
+});
 
   socket.on('disconnect', () => {
     console.log('User terputus:', socket.id);
