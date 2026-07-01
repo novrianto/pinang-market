@@ -124,7 +124,94 @@
 
     .alert.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
     .alert.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+
+    @media (max-width: 768px) {
+      .container {
+        max-width: 95%;
+        padding: 24px;
+      }
+
+      .logo h1 {
+        font-size: 26px;
+        margin-bottom: 4px;
+      }
+
+      .logo p {
+        font-size: 13px;
+      }
+
+      .tabs {
+        padding: 5px;
+        margin-bottom: 20px;
+      }
+
+      .tab {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .field input {
+        padding: 12px 14px;
+        font-size: 16px;
+        min-height: 44px;
+        border-radius: 8px;
+      }
+
+      .btn {
+        padding: 13px;
+        font-size: 15px;
+        min-height: 44px;
+        border-radius: 8px;
+      }
+
+      .alert {
+        padding: 11px 13px;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        max-width: 100%;
+        padding: 16px;
+        border-radius: 0;
+      }
+
+      .logo h1 {
+        font-size: 22px;
+      }
+
+      .logo p {
+        font-size: 12px;
+      }
+
+      .tabs {
+        padding: 4px;
+      }
+
+      .tab {
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .field label {
+        font-size: 12px;
+      }
+
+      .field input {
+        padding: 11px 12px;
+        font-size: 16px;
+        min-height: 40px;
+      }
+
+      .btn {
+        padding: 12px;
+        font-size: 14px;
+        min-height: 40px;
+      }
+    }
   </style>
+  <link rel="stylesheet" href="/css/responsive-fixes.css">
 </head>
 <body>
   <div class="container">

@@ -1,24 +1,43 @@
 const db = require('../database');
 
-// Ambil daftar semua user yang pernah chat dengan kita
+// Ambil daftar semua user yang pernah chat dengan kita (dari messages dan chat_threads)
 function getDaftarChat(req, res) {
   const userId = req.user.id;
-  const daftar = db.prepare(`
-    SELECT DISTINCT
-      u.id, u.nama, u.role,
-      m.isi as pesan_terakhir,
-      m.created_at,
-      (SELECT COUNT(*) FROM messages
-       WHERE receiver_id = ? AND sender_id = u.id AND dibaca = 0) as belum_dibaca
-    FROM messages m
-    JOIN users u ON (
-      CASE WHEN m.sender_id = ? THEN m.receiver_id ELSE m.sender_id END = u.id
-    )
-    WHERE m.sender_id = ? OR m.receiver_id = ?
-    GROUP BY u.id
-    ORDER BY m.created_at DESC
-  `).all(userId, userId, userId, userId);
-  res.json(daftar);
+  
+  try {
+    // Simple approach: get all users involved in messages or chat_threads
+    const daftar = db.prepare(`
+      SELECT DISTINCT
+        u.id, u.nama, u.role,
+        COALESCE(
+          (SELECT isi FROM messages 
+           WHERE (sender_id = u.id AND receiver_id = ?) OR (sender_id = ? AND receiver_id = u.id)
+           ORDER BY created_at DESC LIMIT 1),
+          '[Chat dimulai]'
+        ) as pesan_terakhir,
+        COALESCE(
+          (SELECT MAX(created_at) FROM messages 
+           WHERE (sender_id = u.id AND receiver_id = ?) OR (sender_id = ? AND receiver_id = u.id)),
+          (SELECT MAX(created_at) FROM chat_threads 
+           WHERE (user1_id = u.id AND user2_id = ?) OR (user1_id = ? AND user2_id = u.id))
+        ) as created_at,
+        COALESCE((SELECT COUNT(*) FROM messages
+                 WHERE receiver_id = ? AND sender_id = u.id AND dibaca = 0), 0) as belum_dibaca
+      FROM users u
+      WHERE u.id != ? AND (
+        EXISTS (SELECT 1 FROM messages 
+                WHERE (sender_id = u.id AND receiver_id = ?) OR (sender_id = ? AND receiver_id = u.id))
+        OR EXISTS (SELECT 1 FROM chat_threads 
+                  WHERE (user1_id = u.id AND user2_id = ?) OR (user1_id = ? AND user2_id = u.id))
+      )
+      ORDER BY created_at DESC
+    `).all(userId, userId, userId, userId, userId, userId, userId, userId, userId, userId, userId, userId);
+    
+    res.json(daftar || []);
+  } catch (err) {
+    console.error('Error getDaftarChat:', err);
+    res.status(500).json({ error: err.message });
+  }
 }
 
 // Ambil semua pesan antara 2 user

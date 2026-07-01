@@ -6,6 +6,11 @@
   <title>MarketPinang — Home</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html,
+    body {
+      width: 100%;
+      overflow-x: hidden;
+    }
 
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -24,20 +29,26 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
     }
 
     .navbar-logo { font-size: 22px; font-weight: 700; color: #2563eb; }
 
-    .navbar-menu { display: flex; gap: 12px; align-items: center; }
+    .navbar-menu { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; min-width: 0; justify-content: flex-end; width: 100%; max-width: 100%; }
 
     .navbar-menu button {
-      padding: 8px 16px;
+      padding: 8px 14px;
       border-radius: 8px;
       border: none;
       cursor: pointer;
       font-size: 14px;
       font-weight: 500;
       transition: all 0.2s;
+      white-space: nowrap;
+      min-width: 0;
+      flex-shrink: 1;
     }
 
     .btn-upload {
@@ -63,6 +74,53 @@
     .btn-profile {
       background: #eff6ff;
       color: #2563eb;
+    }
+
+    .btn-profile-mobile {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: none;
+      background: #eff6ff;
+      color: #2563eb;
+      cursor: pointer;
+      font-size: 16px;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .mobile-profile-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 16px 42px rgba(15,23,42,0.15);
+      padding: 10px;
+      min-width: 160px;
+      z-index: 150;
+    }
+
+    .mobile-profile-menu.show {
+      display: block;
+    }
+
+    .mobile-profile-menu button {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      background: #f8fafc;
+      color: #111827;
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .mobile-profile-menu button:last-child {
+      margin-bottom: 0;
     }
 
     .btn-logout {
@@ -364,7 +422,318 @@
     }
 
     .btn-hubungi:hover { background: #15803d; }
+
+    /* MOBILE FIRST - RESPONSIVE */
+    @media (max-width: 768px) {
+      * { font-size: 16px; } /* Prevent zoom on input */
+
+      body { font-size: 14px; }
+
+      .navbar {
+        padding: 12px 16px;
+        gap: 8px;
+        flex-wrap: wrap;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .navbar-logo {
+        font-size: 20px;
+        font-weight: 700;
+        width: 100%;
+        margin-bottom: 4px;
+      }
+
+      .navbar-menu {
+        width: 100%;
+        gap: 6px;
+        align-items: stretch;
+        justify-content: flex-start;
+        position: relative;
+      }
+
+      .navbar-menu button {
+        padding: 10px 12px;
+        font-size: 13px;
+        border-radius: 8px;
+        flex: 1;
+        min-height: 44px; /* Touch target minimum */
+        white-space: nowrap;
+        min-width: 0;
+      }
+
+      .btn-profile,
+      .btn-chat,
+      .btn-logout {
+        display: none;
+      }
+
+      .btn-profile-mobile {
+        display: inline-flex;
+      }
+
+      .user-info {
+        font-size: 13px;
+        width: 100%;
+        margin-bottom: 6px;
+      }
+
+      /* SEARCH SECTION */
+      .search-section {
+        padding: 14px 16px;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .search-bar {
+        flex-direction: column;
+        gap: 8px;
+        max-width: 100%;
+      }
+
+      .search-bar input,
+      .search-bar button {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 16px; /* Prevent zoom */
+        border-radius: 8px;
+        min-height: 44px;
+      }
+
+      .search-bar button {
+        background: #2563eb;
+        color: white;
+        font-weight: 600;
+      }
+
+      .kategori-list {
+        margin-top: 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .kategori-btn {
+        padding: 8px 14px;
+        font-size: 13px;
+        border-radius: 20px;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+      }
+
+      /* MAIN CONTENT */
+      .main {
+        padding: 12px;
+      }
+
+      .section-title {
+        font-size: 16px;
+        margin-bottom: 12px;
+      }
+
+      /* GRID POSTINGAN */
+      .posts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+      }
+
+      .post-card {
+        border-radius: 10px;
+      }
+
+      .post-foto {
+        height: 140px;
+      }
+
+      .post-info {
+        padding: 12px;
+      }
+
+      .post-kategori {
+        font-size: 10px;
+        padding: 2px 8px;
+        margin-bottom: 6px;
+      }
+
+      .post-judul {
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+
+      .post-harga {
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+
+      .post-penjual {
+        font-size: 12px;
+      }
+
+      /* MODAL */
+      .modal-overlay {
+        padding: 12px;
+      }
+
+      .modal {
+        width: 100%;
+        max-width: 100%;
+        padding: 20px;
+        border-radius: 12px;
+      }
+
+      .modal-header {
+        margin-bottom: 16px;
+      }
+
+      .modal-header h2 {
+        font-size: 18px;
+      }
+
+      .modal-close {
+        font-size: 24px;
+      }
+
+      .field {
+        margin-bottom: 14px;
+      }
+
+      .field label {
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+
+      .field input,
+      .field textarea,
+      .field select {
+        padding: 12px 14px;
+        font-size: 16px; /* Prevent zoom */
+        border-radius: 8px;
+        min-height: 44px;
+      }
+
+      .field textarea {
+        min-height: 100px;
+      }
+
+      .btn-submit {
+        min-height: 44px;
+        font-size: 15px;
+        margin-top: 8px;
+      }
+
+      /* DETAIL MODAL */
+      .detail-foto {
+        max-height: 200px;
+        margin-bottom: 12px;
+      }
+
+      .detail-harga {
+        font-size: 20px;
+        margin: 10px 0;
+      }
+
+      .detail-desc {
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 10px 0;
+      }
+
+      .btn-hubungi {
+        min-height: 44px;
+        font-size: 15px;
+      }
+
+      /* POSTINGAN SAYA MODAL */
+      #myposts-container {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar {
+        padding: 10px 12px;
+      }
+
+      .navbar-logo {
+        font-size: 18px;
+      }
+
+      .navbar-menu button {
+        padding: 8px 10px;
+        font-size: 12px;
+        min-height: 40px;
+      }
+
+      .btn-profile,
+      .btn-chat,
+      .btn-logout {
+        display: none;
+      }
+
+      .btn-profile-mobile {
+        display: inline-flex;
+        padding: 8px 10px;
+        font-size: 16px;
+        min-height: 40px;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .search-bar input,
+      .search-bar button {
+        padding: 11px 12px;
+        font-size: 15px;
+        min-height: 40px;
+      }
+
+      .kategori-btn {
+        padding: 7px 12px;
+        font-size: 12px;
+        min-height: 32px;
+      }
+
+      .posts-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .post-foto {
+        height: 120px;
+      }
+
+      .post-info {
+        padding: 10px;
+      }
+
+      .post-judul {
+        font-size: 13px;
+      }
+
+      .post-harga {
+        font-size: 14px;
+      }
+
+      .modal {
+        padding: 16px;
+      }
+
+      .field input,
+      .field textarea,
+      .field select {
+        padding: 11px 12px;
+        font-size: 16px;
+        min-height: 40px;
+      }
+
+      .alert {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+    }
   </style>
+  <link rel="stylesheet" href="/css/responsive-fixes.css">
 </head>
 <body>
 <script src="/js/auth.js"></script>
@@ -380,6 +749,14 @@
     <button class="btn-profile" onclick="window.location.href='/views/profile.html'">👤 Profil</button>
     <button class="btn-chat" onclick="window.location.href='/views/chat.html'">💬 Chat</button>
     <button class="btn-logout" onclick="logout()">Keluar</button>
+    <div class="mobile-profile-wrapper">
+      <button class="btn-profile-mobile" id="btn-profile-mobile" type="button" onclick="toggleProfileMenu()">👤</button>
+      <div class="mobile-profile-menu" id="mobile-profile-menu">
+        <button onclick="window.location.href='/views/chat.html'">💬 Chat</button>
+        <button onclick="window.location.href='/views/profile.html'">✏️ Edit Profile</button>
+        <button onclick="logout()">⛔ Keluar</button>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -569,31 +946,47 @@ if (post.penjual_id == userId) {
 } else {
   btnHubungi.style.display = 'block';
   btnHubungi.onclick = async () => {
-    // Buat chat thread untuk post ini
-    const res = await fetch('/api/chat/thread', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        post_id: post.id,
-        user2_id: post.penjual_id
-      })
-    });
-    const thread = await res.json();
-    
-    // Simpan ke localStorage
-    localStorage.setItem('chat_dengan', post.penjual_id);
-    localStorage.setItem('chat_nama', post.nama_penjual);
-    localStorage.setItem('chat_thread_id', thread.id);
-    localStorage.setItem('chat_post_id', post.id);
-    localStorage.setItem('chat_post_judul', post.judul);
-    localStorage.setItem('chat_post_harga', post.harga);
-    localStorage.setItem('chat_post_foto', post.foto || '');
-    localStorage.setItem('chat_post_deskripsi', post.deskripsi);
-    
-    window.location.href = '/views/chat.html';
+    try {
+      btnHubungi.disabled = true;
+      btnHubungi.textContent = 'Membuka chat...';
+      
+      // Buat chat thread untuk post ini
+      const res = await fetch('/api/chat/thread', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          post_id: post.id,
+          user2_id: post.penjual_id
+        })
+      });
+      
+      if (!res.ok) {
+        throw new Error('Gagal membuat chat');
+      }
+      
+      const thread = await res.json();
+      
+      // Simpan ke localStorage
+      localStorage.setItem('chat_dengan', post.penjual_id);
+      localStorage.setItem('chat_nama', post.nama_penjual);
+      localStorage.setItem('chat_role', 'user');
+      localStorage.setItem('chat_thread_id', thread.id);
+      localStorage.setItem('chat_post_id', post.id);
+      localStorage.setItem('chat_post_judul', post.judul);
+      localStorage.setItem('chat_post_harga', post.harga);
+      localStorage.setItem('chat_post_foto', post.foto || '');
+      localStorage.setItem('chat_post_deskripsi', post.deskripsi);
+      
+      // Redirect ke chat
+      window.location.href = '/views/chat.html';
+    } catch (err) {
+      btnHubungi.disabled = false;
+      btnHubungi.textContent = '💬 Hubungi Penjual';
+      alert('❌ Gagal membuka chat: ' + err.message);
+    }
   };
 }
 
@@ -703,6 +1096,14 @@ if (post.penjual_id == userId) {
     el.style.display = 'block';
   }
 
+  function toggleProfileMenu() {
+    document.getElementById('mobile-profile-menu').classList.toggle('show');
+  }
+
+  function closeProfileMenu() {
+    document.getElementById('mobile-profile-menu').classList.remove('show');
+  }
+
   function logout() {
     localStorage.clear();
     window.location.href = '/views/auth.html';
@@ -713,6 +1114,16 @@ if (post.penjual_id == userId) {
     overlay.addEventListener('click', e => {
       if (e.target === overlay) overlay.classList.remove('show');
     });
+  });
+
+  // Tutup mobile profile menu kalau klik di luar
+  document.addEventListener('click', e => {
+    const profileBtn = document.getElementById('btn-profile-mobile');
+    const menu = document.getElementById('mobile-profile-menu');
+    if (!menu || !profileBtn) return;
+    if (!profileBtn.contains(e.target) && !menu.contains(e.target)) {
+      menu.classList.remove('show');
+    }
   });
 
   // Load pertama kali

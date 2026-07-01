@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MarketPinang — Profil</title>
   <style>
@@ -97,7 +97,155 @@
     .alert.error { background: #fef2f2; color: #dc2626; }
     .alert.success { background: #f0fdf4; color: #16a34a; }
     @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+
+  @media (max-width: 768px) {
+      .navbar {
+        padding: 10px 14px;
+        flex-wrap: wrap;
+      }
+
+      .navbar-logo {
+        font-size: 18px;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      .navbar-menu {
+        width: 100%;
+        gap: 6px;
+      }
+
+      .navbar-menu a {
+        padding: 10px 12px;
+        font-size: 13px;
+        flex: 1;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+      }
+
+      .container {
+        margin: 16px auto;
+        padding: 0 12px;
+      }
+
+      .card {
+        padding: 18px;
+        border-radius: 12px;
+      }
+
+      .card h2 {
+        font-size: 17px;
+      }
+
+      .avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+      }
+
+      .btn-upload-foto {
+        padding: 9px 14px;
+        font-size: 13px;
+        min-height: 40px;
+      }
+
+      .field input {
+        padding: 12px 14px;
+        font-size: 16px;
+        min-height: 44px;
+      }
+
+      .field-readonly {
+        padding: 12px 14px;
+        font-size: 14px;
+      }
+
+      .stats {
+        padding: 14px;
+        gap: 10px;
+      }
+
+      .button-group {
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .btn-save,
+      .btn-batal {
+        padding: 12px;
+        font-size: 14px;
+        min-height: 44px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar {
+        padding: 8px 10px;
+      }
+
+      .navbar-logo {
+        font-size: 16px;
+      }
+
+      .navbar-menu a {
+        padding: 8px 10px;
+        font-size: 12px;
+        min-height: 36px;
+      }
+
+      .container {
+        margin: 10px auto;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .card h2 {
+        font-size: 15px;
+      }
+
+      .avatar {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+      }
+
+      .btn-upload-foto {
+        padding: 8px 12px;
+        font-size: 12px;
+        min-height: 36px;
+      }
+
+      .field input {
+        padding: 11px 12px;
+        font-size: 16px;
+        min-height: 40px;
+      }
+
+      .stats {
+        padding: 10px;
+      }
+
+      .stat-value {
+        font-size: 20px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .btn-save,
+      .btn-batal {
+        width: 100%;
+        padding: 11px;
+        min-height: 40px;
+        font-size: 13px;
+      }
+    }
   </style>
+  <link rel="stylesheet" href="/css/responsive-fixes.css">
 </head>
 <body>
 <script src="/js/auth.js"></script>
