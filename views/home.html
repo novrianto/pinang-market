@@ -933,7 +933,17 @@
     document.getElementById('detail-kategori').textContent = post.kategori;
     document.getElementById('detail-harga').textContent = `Rp ${Number(post.harga).toLocaleString('id-ID')}`;
     document.getElementById('detail-desc').textContent = post.deskripsi;
-    document.getElementById('detail-penjual').textContent = `👤 Dijual oleh: ${post.nama_penjual}`;
+    const detailPenjual = document.getElementById('detail-penjual');
+    detailPenjual.innerHTML = '';
+    const sellerLabel = document.createElement('span');
+    sellerLabel.textContent = '👤 Dijual oleh: ';
+    const sellerLink = document.createElement('a');
+    sellerLink.href = `/views/profile.html?id=${post.penjual_id}`;
+    sellerLink.textContent = post.nama_penjual;
+    sellerLink.className = 'seller-profile-link';
+    sellerLink.style = 'color:#2563eb;text-decoration:none;font-weight:600;cursor:pointer;';
+    detailPenjual.appendChild(sellerLabel);
+    detailPenjual.appendChild(sellerLink);
 
     const fotoContainer = document.getElementById('detail-foto-container');
     fotoContainer.innerHTML = post.foto

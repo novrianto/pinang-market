@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const { authUser } = require('../middleware/auth');
-const { getProfile, editProfile } = require('../controllers/profileController');
+const { getProfile, getProfileById, editProfile } = require('../controllers/profileController');
 
 // Setup upload foto profil
 const storage = multer.diskStorage({
@@ -28,6 +28,7 @@ const upload = multer({
 
 // Routes
 router.get('/', authUser, getProfile);
+router.get('/:id', authUser, getProfileById);
 router.post('/edit', authUser, upload.single('foto_profil'), editProfile);
 
 module.exports = router;

@@ -238,26 +238,50 @@
     padding: 20px;
 }
 
-/* Membungkus bubble agar bisa pindah posisi */
+/* Elemen utama pembungkus luar per satu baris pesan */
 .bubble-wrap {
     display: flex;
+    width: 100%;
+    margin-bottom: 8px;
+    box-sizing: border-box;
     align-items: flex-end;
-    gap: 8px;
-    max-width: 80%; /* Batas lebar chat */
 }
 
-/* Jika pesan dari user sendiri (posisi kanan) */
+/* Jika pesan dari user sendiri (Otomatis geser penuh ke KANAN) */
 .bubble-wrap.saya {
-    align-self: flex-end; /* Memindahkan kotak ke kanan */
-    flex-direction: row-reverse; /* Avatar di kanan, bubble di kiri */
+    justify-content: flex-end; /* Memindahkan gelembung ke kanan dengan aman */
 }
 
-/* Styling Bubble */
+.bubble-wrap.saya > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* Jika pesan dari lawan bicara (Otomatis geser penuh ke KIRI) */
+.bubble-wrap:not(.saya) {
+    justify-content: flex-start;
+}
+
+.bubble-wrap:not(.saya) > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Aturan Gelembung Chat */
 .bubble {
     padding: 8px 12px;
     border-radius: 12px;
     font-size: 14px;
-    word-wrap: break-word;
+    display: inline-block;
+    max-width: 75%;
+    min-width: 56px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    box-sizing: border-box;
 }
 
 .bubble-saya {
@@ -270,6 +294,7 @@
     border: 1px solid #e5e5e5;
     border-bottom-left-radius: 2px;
 }
+
 
     .bubble-time {
       font-size: 10px;
@@ -338,22 +363,105 @@
     .chat-input-actions {
       width: 100%;
       display: flex;
+      flex-direction: column;
       gap: 8px;
+    }
+
+    .btn-quick-toggle {
+      padding: 10px 14px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-quick-toggle:hover {
+      background: #1d4ed8;
+    }
+
+    .quick-actions-panel {
+      display: none;
       flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .quick-actions-panel.show {
+      display: flex;
     }
 
     .btn-quick {
-      padding: 7px 12px;
-      background: #f1f5f9;
-      color: #374151;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      font-size: 12px;
+      padding: 9px 14px;
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 13px;
       cursor: pointer;
       transition: all 0.2s;
+      flex: 1 1 calc(50% - 8px);
+      min-width: 120px;
+      text-align: center;
     }
 
     .btn-quick:hover { background: #e2e8f0; }
+
+    .product-card-small {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+      margin-bottom: 12px;
+    }
+
+    .product-card-small img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 14px;
+      flex-shrink: 0;
+    }
+
+    .product-card-small .product-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .product-card-small .product-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .product-card-small .product-card-desc {
+      font-size: 12px;
+      color: #475569;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .product-card-small .product-card-price {
+      font-size: 15px;
+      font-weight: 700;
+      color: #16a34a;
+    }
 
     .input-row {
       width: 100%;
@@ -628,6 +736,11 @@
         padding: 9px 12px;
         font-size: 13px;
         border-radius: 12px;
+        display: inline-block;
+        min-width: 42px;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
       }
 
       .chat-input-wrap {
@@ -738,7 +851,9 @@
       }
 
       .sidebar {
-        height: 100px;
+        height: auto;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
       }
 
       .sidebar-header h3 {
@@ -969,8 +1084,10 @@
   socket.on('new_message', (pesan) => {
     if (chatThreadAktif && 
         (pesan.sender_id === lawanAktif || pesan.receiver_id === lawanAktif)) {
-      tampilkanPesan(pesan);
-      scrollBawah();
+      if (pesan.sender_id !== userId) {
+        tampilkanPesan(pesan);
+        scrollBawah();
+      }
     }
     loadDaftarChat();
   });
@@ -991,7 +1108,7 @@
   // Load daftar chat
   async function loadDaftarChat() {
     try {
-      const res = await fetch('/api/messages/daftar', {
+      const res = await fetch('/api/messages/threads', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -1023,15 +1140,17 @@
 
     if (postJudul && postHarga) {
       const photoHtml = postFoto
-        ? `<img src="${postFoto}" style="width:100%;height:130px;object-fit:cover;border-radius:10px;margin-bottom:10px">`
-        : '<div style="width:100%;height:130px;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:10px">📦</div>';
+        ? `<img src="${postFoto}" alt="Foto produk">`
+        : '<div style="width:64px;height:64px;border-radius:14px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:24px">📦</div>';
 
       container.innerHTML = `
-        <div style="background:white;border:1px solid #e2e8f0;border-radius:14px;padding:14px;box-shadow:0 8px 20px rgba(0,0,0,0.05);">
+        <div class="product-card-small">
           ${photoHtml}
-          <div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:6px">${postJudul}</div>
-          <div style="font-size:13px;color:#64748b;margin-bottom:8px">${postDeskripsi?.substring(0, 80) || ''}</div>
-          <div style="font-size:16px;font-weight:700;color:#16a34a">Rp ${Number(postHarga).toLocaleString('id-ID')}</div>
+          <div class="product-card-info">
+            <div class="product-card-title">${postJudul}</div>
+            <div class="product-card-desc">${postDeskripsi?.substring(0, 60) || ''}</div>
+            <div class="product-card-price">Rp ${Number(postHarga).toLocaleString('id-ID')}</div>
+          </div>
         </div>
       `;
       container.style.display = 'block';
@@ -1050,127 +1169,162 @@
   }
 
   // Buka chat
-  async function bukaChat(idLawan, nama, role) {
-    lawanAktif = idLawan;
-    namaLawanAktif = nama;
+  async function bukaChat(idLawan, nama, role, threadId = null) {
+    try {
+      console.log('bukaChat dipanggil:', idLawan, nama, role, threadId);
+      
+      lawanAktif = idLawan;
+      namaLawanAktif = nama;
 
-    const chatArea = document.getElementById('chat-area');
-
-    // Ambil atau buat chat thread
-    let chatThreadId = localStorage.getItem('chat_thread_id');
-    if (chatThreadId) {
-      chatThreadAktif = parseInt(chatThreadId, 10);
-      localStorage.removeItem('chat_thread_id');
-    } else {
-      chatThreadAktif = null;
-    }
-
-    // Simpan target chat terakhir agar bisa direstore ketika kembali ke halaman chat
-    localStorage.setItem('last_chat_with', lawanAktif);
-    localStorage.setItem('last_chat_name', nama);
-    localStorage.setItem('last_chat_role', role);
-
-    // ... rest of the code
-
-    hargaOriginal = parseInt(localStorage.getItem('chat_harga_original') || '0', 10);
-    localStorage.removeItem('chat_harga_original');
-
-    // Ambil info chat
-    if (chatThreadAktif) {
-      const infoRes = await fetch(`/api/chat/${chatThreadAktif}/info`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const info = await infoRes.json();
-
-      if (info.chat.status !== 'active') {
-        chatArea.innerHTML = `
-          <div class="chat-closed-banner">
-            Chat telah ditutup (Status: ${info.chat.status === 'completed' ? 'Selesai' : 'Tidak Tertarik'})
-          </div>
-          <div class="messages-wrap" id="messages-wrap"></div>
-        `;
-        loadRiwayatChat();
+      const chatArea = document.getElementById('chat-area');
+      if (!chatArea) {
+        console.error('chat-area element tidak ditemukan!');
         return;
       }
-    }
 
-    chatArea.innerHTML = `
-      <div class="chat-header">
-        <button class="btn-back-chat" type="button" onclick="showChatList()">← Daftar Chat</button>
-        <div class="avatar ${role === 'admin' ? 'avatar-admin' : 'avatar-user'}" style="width:36px;height:36px;font-size:13px">
-          ${nama.charAt(0).toUpperCase()}
-        </div>
-        <div>
-          <div class="chat-header-nama">${nama} ${role === 'admin' ? '👑 Admin' : ''}</div>
-          <div class="chat-header-status">● Online</div>
-        </div>
-        <div class="chat-header-actions">
-          ${role !== 'admin' ? `<button class="btn-header btn-rekber" onclick="inviteAdmin()">🛡️ Invite Admin (Rekber)</button>` : ''}
-        </div>
-      </div>
-      <div id="product-card-container" class="product-card-container" style="display:none;margin-bottom:12px;"></div>
-      <div class="messages-wrap" id="messages-wrap"></div>
-      <div id="nego-container"></div>
-      <div class="chat-input-wrap" id="chat-input-wrap">
-        <div class="chat-input-actions" id="quick-actions"></div>
-        <div class="input-row">
-          <textarea class="chat-input" id="input-pesan" placeholder="Tulis pesan..." rows="1"
-            onkeydown="handleEnter(event)"></textarea>
-          <button class="btn-kirim" onclick="kirimPesan()">Kirim</button>
-        </div>
-      </div>
-    `;
+      // Ambil atau buat chat thread
+      if (threadId) {
+        chatThreadAktif = threadId;
+      } else {
+        const chatThreadId = localStorage.getItem('chat_thread_id');
+        if (chatThreadId) {
+          chatThreadAktif = parseInt(chatThreadId, 10);
+          localStorage.removeItem('chat_thread_id');
+          console.log('Chat thread dari localStorage:', chatThreadAktif);
+        } else {
+          chatThreadAktif = null;
+        }
+      }
 
-    // Set quick actions
-    const quickActions = document.getElementById('quick-actions');
-    const postJudul = localStorage.getItem('chat_post_judul');
-    
-    if (postJudul) {
-      // Ada produk, tampilkan quick messages tentang produk
-      quickActions.innerHTML = `
-        <button class="btn-quick" onclick="quickMsg('Apakah barang ini masih tersedia?')">❓ Masih ada?</button>
-        <button class="btn-quick" onclick="quickMsg('Berapa berat barangnya untuk ongkos kirim?')">⚖️ Berat?</button>
-        <button class="btn-quick" onclick="openNegoModal()">💰 Nego Harga</button>
-        <button class="btn-quick" onclick="openTutupChatModal()">❌ Akhiri Chat</button>
+      // Simpan target chat terakhir agar bisa direstore ketika kembali ke halaman chat
+      localStorage.setItem('last_chat_with', lawanAktif);
+      localStorage.setItem('last_chat_name', nama);
+      localStorage.setItem('last_chat_role', role);
+      if (chatThreadAktif) {
+        localStorage.setItem('last_chat_thread_id', chatThreadAktif);
+      } else {
+        localStorage.removeItem('last_chat_thread_id');
+      }
+
+      hargaOriginal = parseInt(localStorage.getItem('chat_harga_original') || '0', 10);
+      localStorage.removeItem('chat_harga_original');
+
+      // Ambil info chat
+      if (chatThreadAktif) {
+        try {
+          const infoRes = await fetch(`/api/chat/${chatThreadAktif}/info`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const info = await infoRes.json();
+
+          if (info.chat && info.chat.status !== 'active') {
+            chatArea.innerHTML = `
+              <div class="chat-closed-banner">
+                Chat telah ditutup (Status: ${info.chat.status === 'completed' ? 'Selesai' : 'Tidak Tertarik'})
+              </div>
+              <div class="messages-wrap" id="messages-wrap"></div>
+            `;
+            await loadRiwayatChat();
+            return;
+          }
+        } catch (err) {
+          console.warn('Error mengecek info chat:', err);
+        }
+      }
+
+      console.log('Rendering chat area untuk:', nama);
+      chatArea.innerHTML = `
+        <div class="chat-header">
+          <button class="btn-back-chat" type="button" onclick="showChatList()">← Daftar Chat</button>
+          <div class="avatar ${role === 'admin' ? 'avatar-admin' : 'avatar-user'}" style="width:36px;height:36px;font-size:13px">
+            ${escapeHtml(nama.charAt(0).toUpperCase())}
+          </div>
+          <div>
+            <div class="chat-header-nama">${escapeHtml(nama)} ${role === 'admin' ? '👑 Admin' : ''}</div>
+            <div class="chat-header-status">● Online</div>
+          </div>
+          <div class="chat-header-actions">
+            ${role !== 'admin' ? `<button class="btn-header btn-rekber" onclick="inviteAdmin()">🛡️ Invite Admin (Rekber)</button>` : ''}
+          </div>
+        </div>
+        <div id="product-card-container" class="product-card-container" style="display:none;margin-bottom:12px;"></div>
+        <div class="messages-wrap" id="messages-wrap"></div>
+        <div id="nego-container"></div>
+        <div class="chat-input-wrap" id="chat-input-wrap">
+          <div class="chat-input-actions" id="quick-actions">
+            <button class="btn-quick-toggle" type="button" onclick="toggleQuickActions()">
+              Template Chat
+              <span id="quick-toggle-icon">▾</span>
+            </button>
+            <div class="quick-actions-panel" id="quick-actions-panel"></div>
+          </div>
+          <div class="input-row">
+            <textarea class="chat-input" id="input-pesan" placeholder="Tulis pesan..." rows="1" onkeydown="handleEnter(event)"></textarea>
+            <button class="btn-kirim" onclick="kirimPesan()">Kirim</button>
+          </div>
+        </div>
       `;
-    } else {
-      // Chat normal tanpa produk
-      quickActions.innerHTML = `
-        <button class="btn-quick" onclick="quickMsg('Halo')">👋 Halo</button>
-        <button class="btn-quick" onclick="openNegoModal()">💰 Nego Harga</button>
-        <button class="btn-quick" onclick="openTutupChatModal()">❌ Akhiri Chat</button>
-      `;
-    }
 
-    await loadRiwayatChat();
-    await loadNegotiasi();
+      // Set quick actions
+      const postJudul = localStorage.getItem('chat_post_judul');
+      const quickPanel = document.getElementById('quick-actions-panel');
+      if (!quickPanel) return;
 
-    if (window.negoInterval) clearInterval(window.negoInterval);
-        window.negoInterval = setInterval(async () => {
+      if (postJudul) {
+        quickPanel.innerHTML = `
+          <button class="btn-quick" onclick="quickMsg('Apakah barang ini masih tersedia?')">❓ Masih ada?</button>
+          <button class="btn-quick" onclick="quickMsg('Berapa berat barangnya untuk ongkos kirim?')">⚖️ Berat?</button>
+          <button class="btn-quick" onclick="openNegoModal()">💰 Nego Harga</button>
+          <button class="btn-quick" onclick="openTutupChatModal()">❌ Akhiri Chat</button>
+        `;
+      } else {
+        quickPanel.innerHTML = `
+          <button class="btn-quick" onclick="quickMsg('Halo')">👋 Halo</button>
+          <button class="btn-quick" onclick="openNegoModal()">💰 Nego Harga</button>
+          <button class="btn-quick" onclick="openTutupChatModal()">❌ Akhiri Chat</button>
+        `;
+      }
+
+      console.log('Loading chat history dan negotiation...');
+      await loadRiwayatChat();
       await loadNegotiasi();
-    }, 3000);
 
-    if (localStorage.getItem('chat_post_judul')) {
-      showProductCard();
-    }
+      if (window.negoInterval) clearInterval(window.negoInterval);
+      window.negoInterval = setInterval(async () => {
+        await loadNegotiasi();
+      }, 3000);
 
-    scrollBawah();
-    await loadDaftarChat();
-    setActiveChatItem();
-    document.getElementById('input-pesan')?.focus();
-    if (isMobileView()) {
-      showChatArea();
-    }
+      if (localStorage.getItem('chat_post_judul')) {
+        showProductCard();
+      }
+
+      scrollBawah();
+      await loadDaftarChat();
+      setActiveChatItem();
+      
+      const inputPesan = document.getElementById('input-pesan');
+      if (inputPesan) {
+        inputPesan.focus();
+      }
+      
       if (isMobileView()) {
         showChatArea();
       }
+      
+      console.log('bukaChat selesai - chat siap digunakan');
+    } catch (err) {
+      console.error('Error di bukaChat:', err);
+      alert('❌ Error membuka chat: ' + err.message);
+    }
+  }
 
   // Load riwayat chat
   async function loadRiwayatChat() {
     if (!lawanAktif) return;
     
     try {
-      const res = await fetch(`/api/messages/${lawanAktif}`, {
+      const endpoint = chatThreadAktif ? `/api/messages/thread/${chatThreadAktif}` : `/api/messages/${lawanAktif}`;
+      const res = await fetch(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -1417,8 +1571,13 @@
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ receiver_id: lawanAktif, isi })
+        body: JSON.stringify({ receiver_id: lawanAktif, isi, chat_id: chatThreadAktif })
       });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || 'Gagal mengirim pesan');
+      }
 
       const pesan = await res.json();
       socket.emit('private_message', {
@@ -1427,22 +1586,13 @@
         receiver_id: lawanAktif
       });
 
-    } catch {
-      alert('Gagal mengirim pesan');
+      tampilkanPesan(pesan);
+      scrollBawah();
+      await loadDaftarChat();
+    } catch (err) {
+      console.error('Error mengirim pesan:', err);
+      alert('Gagal mengirim pesan: ' + err.message);
     }
-  }
-
-  // Modal
-  function openNegoModal() {
-    document.getElementById('modal-nego').classList.add('show');
-  }
-
-  function openTutupChatModal() {
-    document.getElementById('modal-tutup-chat').classList.add('show');
-  }
-
-  function tutupModal(id) {
-    document.getElementById(id).classList.remove('show');
   }
 
   // Tutup chat & rating
@@ -1583,6 +1733,14 @@
               .replace(/>/g,'&gt;');
   }
 
+  function toggleQuickActions() {
+    const panel = document.getElementById('quick-actions-panel');
+    const icon = document.getElementById('quick-toggle-icon');
+    if (!panel || !icon) return;
+    const open = panel.classList.toggle('show');
+    icon.textContent = open ? '▴' : '▾';
+  }
+
   function setActiveChatItem() {
     document.querySelectorAll('.chat-item').forEach(item => {
       const id = parseInt(item.dataset.id, 10);
@@ -1599,22 +1757,46 @@
       return;
     }
 
-    container.innerHTML = daftar.map(d => `
-      <div class="chat-item ${d.id === lawanAktif ? 'active' : ''}"
-           data-id="${d.id}"
-           onclick="bukaChat(${d.id}, ${JSON.stringify(d.nama)}, ${JSON.stringify(d.role)})">
-        <div class="avatar ${d.role === 'admin' ? 'avatar-admin' : 'avatar-user'}">
-          ${escapeHtml(d.nama.charAt(0).toUpperCase())}
+    container.innerHTML = '';
+
+    daftar.forEach(d => {
+      const counterpartId = d.counterpart_id || d.id;
+      const counterpartName = d.counterpart_nama || d.nama;
+      const counterpartRole = d.counterpart_role || d.role;
+      const threadId = d.chat_id || d.thread_id || null;
+      const active = counterpartId === lawanAktif;
+
+      const item = document.createElement('div');
+      item.className = `chat-item${active ? ' active' : ''}`;
+      item.dataset.id = counterpartId;
+      item.dataset.chatid = threadId || '';
+      item.dataset.name = counterpartName;
+      item.dataset.role = counterpartRole;
+
+      item.innerHTML = `
+        <div class="avatar ${counterpartRole === 'admin' ? 'avatar-admin' : 'avatar-user'}">
+          ${escapeHtml(counterpartName.charAt(0).toUpperCase())}
         </div>
         <div class="chat-item-info">
           <div class="chat-item-nama">
-            <span>${escapeHtml(d.nama)} ${d.role === 'admin' ? '👑' : ''}</span>
+            <span>${escapeHtml(counterpartName)} ${counterpartRole === 'admin' ? '👑' : ''}</span>
             ${d.belum_dibaca > 0 ? `<span class="badge-unread">${d.belum_dibaca}</span>` : ''}
           </div>
           <div class="chat-item-preview">${escapeHtml(d.pesan_terakhir || '')}</div>
         </div>
-      </div>
-    `).join('');
+      `;
+
+      item.addEventListener('click', () => {
+        bukaChat(
+          parseInt(item.dataset.id, 10),
+          item.dataset.name,
+          item.dataset.role,
+          item.dataset.chatid ? parseInt(item.dataset.chatid, 10) : null
+        );
+      });
+
+      container.appendChild(item);
+    });
   }
 
   // Modal user baru
@@ -1706,33 +1888,43 @@
   async function initChatPage() {
     try {
       console.log('Initializing chat page...');
-      await loadDaftarChat();
-      console.log('Chat list loaded, lawanAktif:', lawanAktif);
+
+      const chatDengan = localStorage.getItem('chat_dengan');
+      const chatNama = localStorage.getItem('chat_nama');
+      const chatRole = localStorage.getItem('chat_role') || 'user';
+      let openedFromLink = false;
+
+      if (chatDengan && chatNama) {
+        console.log('Opening chat from localStorage:', chatDengan, chatNama);
+        const chatThreadId = parseInt(localStorage.getItem('chat_thread_id') || '0', 10) || null;
+        await bukaChat(parseInt(chatDengan, 10), chatNama, chatRole, chatThreadId);
+        localStorage.removeItem('chat_dengan');
+        localStorage.removeItem('chat_nama');
+        localStorage.removeItem('chat_role');
+        localStorage.removeItem('chat_thread_id');
+        openedFromLink = true;
+      }
+
+      if (!openedFromLink) {
+        await loadDaftarChat();
+      }
+
+      console.log('Chat page initialized, lawanAktif:', lawanAktif);
 
       if (isMobileView()) {
         showChatList();
       }
 
-      const chatDengan = localStorage.getItem('chat_dengan');
-      const chatNama = localStorage.getItem('chat_nama');
-      const chatRole = localStorage.getItem('chat_role') || 'user';
+      if (!openedFromLink) {
+        const lastChatDengan = localStorage.getItem('last_chat_with');
+        const lastChatNama = localStorage.getItem('last_chat_name');
+        const lastChatRole = localStorage.getItem('last_chat_role') || 'user';
+        const lastChatThreadId = parseInt(localStorage.getItem('last_chat_thread_id') || '0', 10) || null;
 
-      if (chatDengan && chatNama) {
-        console.log('Opening chat from localStorage:', chatDengan, chatNama);
-        await bukaChat(parseInt(chatDengan, 10), chatNama, chatRole);
-        localStorage.removeItem('chat_dengan');
-        localStorage.removeItem('chat_nama');
-        localStorage.removeItem('chat_role');
-        return;
-      }
-
-      const lastChatDengan = localStorage.getItem('last_chat_with');
-      const lastChatNama = localStorage.getItem('last_chat_name');
-      const lastChatRole = localStorage.getItem('last_chat_role') || 'user';
-
-      if (!isMobileView() && lastChatDengan && lastChatNama) {
-        console.log('Restoring last chat:', lastChatDengan, lastChatNama);
-        await bukaChat(parseInt(lastChatDengan, 10), lastChatNama, lastChatRole);
+        if (!isMobileView() && lastChatDengan && lastChatNama) {
+          console.log('Restoring last chat:', lastChatDengan, lastChatNama, lastChatThreadId);
+          await bukaChat(parseInt(lastChatDengan, 10), lastChatNama, lastChatRole, lastChatThreadId);
+        }
       }
     } catch (err) {
       console.error('Error initializing chat page:', err);

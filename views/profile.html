@@ -312,18 +312,44 @@
 
   <script>
     const token = localStorage.getItem('token');
+    const currentUserId = parseInt(localStorage.getItem('userId'), 10);
     if (!token) {
       window.location.href = '/views/auth.html';
     }
 
+    function getQueryParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
     async function loadProfile() {
       try {
-        const res = await fetch('/api/profile', {
+        const requestedId = getQueryParam('id');
+        const isOwnProfile = !requestedId || parseInt(requestedId, 10) === currentUserId;
+        const endpoint = requestedId ? `/api/profile/${requestedId}` : '/api/profile';
+        console.log('Loading profile endpoint:', endpoint, 'currentUserId:', currentUserId);
+        const res = await fetch(endpoint, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const data = await res.json();
+
+        let data;
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          throw new Error(`Unexpected response: ${text}`);
+        }
 
         if (!res.ok) throw new Error(data.error || 'Gagal memuat profil');
+
+        if (!isOwnProfile) {
+          const editSection = document.getElementById('profileForm');
+          const alertProfile = document.getElementById('alertProfile');
+          const postSectionHeading = document.querySelector('.grid section.card h3');
+          if (editSection) editSection.style.display = 'none';
+          if (alertProfile) alertProfile.style.display = 'none';
+          if (postSectionHeading) postSectionHeading.textContent = '📦 Postingan Penjual';
+        }
 
         document.getElementById('userName').textContent = data.user?.nama || 'Tanpa nama';
         document.getElementById('userEmail').textContent = data.user?.email || '-';

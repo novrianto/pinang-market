@@ -93,6 +93,28 @@
       transition: border 0.2s;
     }
 
+    .password-input-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      color: #64748b;
+    }
+
+    .password-toggle:hover {
+      color: #2563eb;
+    }
+
     .field input:focus {
       border-color: #2563eb;
     }
@@ -232,9 +254,12 @@
         <label>Email</label>
         <input type="email" id="login-email" placeholder="contoh@email.com">
       </div>
-      <div class="field">
+      <div class="field field-password">
         <label>Password</label>
-        <input type="password" id="login-password" placeholder="Password kamu">
+        <div class="password-input-wrapper">
+          <input type="password" id="login-password" placeholder="Password kamu">
+          <button type="button" class="password-toggle" id="login-password-toggle" onclick="togglePassword('login-password','login-password-toggle')" aria-label="Tampilkan kata sandi">👁️</button>
+        </div>
       </div>
       <button class="btn" onclick="login()">Masuk</button>
     </div>
@@ -305,6 +330,21 @@
 
       } catch {
         showAlert('alert-login', 'Gagal terhubung ke server', 'error');
+      }
+    }
+
+    function togglePassword(inputId, toggleId) {
+      const input = document.getElementById(inputId);
+      const toggle = document.getElementById(toggleId);
+      if (!input || !toggle) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        toggle.textContent = '🙈';
+        toggle.setAttribute('aria-label', 'Sembunyikan kata sandi');
+      } else {
+        input.type = 'password';
+        toggle.textContent = '👁️';
+        toggle.setAttribute('aria-label', 'Tampilkan kata sandi');
       }
     }
 

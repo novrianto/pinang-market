@@ -49,6 +49,49 @@ function getProfile(req, res) {
   }
 }
 
+function getProfileById(req, res) {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    if (!userId) return res.status(400).json({ error: 'ID user tidak valid' });
+
+    const user = db.prepare('SELECT id, nama, email, role, foto_profil, created_at FROM users WHERE id = ?').get(userId);
+    if (!user) return res.status(404).json({ error: 'User tidak ditemukan' });
+
+    const stats = db.prepare(`
+      SELECT 
+        COUNT(*) as total_posts,
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+        SUM(CASE WHEN status = 'sold' THEN 1 ELSE 0 END) as sold
+      FROM posts WHERE user_id = ?
+    `).get(userId);
+
+    const posts = db.prepare(`
+      SELECT id, judul, deskripsi, harga, kategori, foto, status, created_at
+      FROM posts WHERE user_id = ? AND status = 'approved'
+      ORDER BY created_at DESC
+    `).all(userId);
+
+    res.json({
+      user: {
+        id: user.id,
+        nama: user.nama,
+        email: user.email,
+        role: user.role,
+        foto_profil: user.foto_profil,
+        created_at: user.created_at
+      },
+      stats: {
+        total_posts: stats.total_posts || 0,
+        approved: stats.approved || 0,
+        sold: stats.sold || 0
+      },
+      posts: posts
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
 // Edit profil user
 function editProfile(req, res) {
   try {
@@ -129,4 +172,4 @@ function editProfile(req, res) {
   }
 }
 
-module.exports = { getProfile, editProfile };
+module.exports = { getProfile, getProfileById, editProfile };

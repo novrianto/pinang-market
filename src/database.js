@@ -100,6 +100,11 @@ db.exec(`
   
 `);
 
+const messageColumns = db.prepare("PRAGMA table_info(messages)").all().map(c => c.name);
+if (!messageColumns.includes('chat_id')) {
+  db.prepare('ALTER TABLE messages ADD COLUMN chat_id INTEGER').run();
+}
+
 // Buat akun admin default kalau belum ada
 const bcrypt = require('bcryptjs');
 const adminAda = db.prepare('SELECT id FROM users WHERE role = ?').get('admin');
