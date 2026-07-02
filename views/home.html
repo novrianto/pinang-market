@@ -36,7 +36,7 @@
 
     .navbar-logo { font-size: 22px; font-weight: 700; color: #2563eb; }
 
-    .navbar-menu { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; min-width: 0; justify-content: flex-end; width: 100%; max-width: 100%; }
+    .navbar-menu { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; min-width: 0; justify-content: flex-end; width: 100%; max-width: 100%; position: relative; }
 
     .navbar-menu button {
       padding: 8px 14px;
@@ -49,6 +49,67 @@
       white-space: nowrap;
       min-width: 0;
       flex-shrink: 1;
+    }
+
+    .profile-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 16px 42px rgba(15,23,42,0.15);
+      padding: 14px;
+      min-width: 220px;
+      z-index: 150;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .profile-menu.show {
+      display: flex;
+    }
+
+    .profile-menu button,
+    .profile-menu select,
+    .profile-menu input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      color: #111827;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .profile-menu button {
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #111827;
+    }
+
+    .profile-menu button.logout-btn {
+      background: #fef2f2;
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+
+    .profile-menu .menu-divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 6px 0;
+    }
+
+    .profile-menu .menu-title {
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .profile-menu .menu-controls {
+      display: grid;
+      gap: 8px;
     }
 
     .btn-upload {
@@ -74,11 +135,20 @@
     .btn-profile {
       background: #eff6ff;
       color: #2563eb;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: 50%;
+      min-width: 40px;
+      min-height: 40px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .btn-profile-mobile {
       display: none;
-      padding: 10px 12px;
+      padding: 10px;
       border-radius: 12px;
       border: none;
       background: #eff6ff;
@@ -89,38 +159,65 @@
       min-height: 44px;
     }
 
-    .mobile-profile-menu {
+    .profile-menu {
       display: none;
       position: absolute;
-      top: 100%;
+      top: calc(100% + 10px);
       right: 0;
       background: white;
       border-radius: 14px;
       box-shadow: 0 16px 42px rgba(15,23,42,0.15);
-      padding: 10px;
-      min-width: 160px;
+      padding: 14px;
+      min-width: 240px;
       z-index: 150;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    .mobile-profile-menu.show {
-      display: block;
+    .profile-menu.show {
+      display: flex;
     }
 
-    .mobile-profile-menu button {
+    .profile-menu button,
+    .profile-menu select,
+    .profile-menu input {
       width: 100%;
-      text-align: left;
       padding: 10px 12px;
       border-radius: 10px;
-      border: none;
-      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      background: white;
       color: #111827;
+      text-align: left;
       font-size: 14px;
-      cursor: pointer;
-      margin-bottom: 8px;
     }
 
-    .mobile-profile-menu button:last-child {
-      margin-bottom: 0;
+    .profile-menu button {
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #111827;
+    }
+
+    .profile-menu button.logout-btn {
+      background: #fef2f2;
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+
+    .profile-menu .menu-divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 6px 0;
+    }
+
+    .profile-menu .menu-title {
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .profile-menu .menu-controls {
+      display: grid;
+      gap: 8px;
     }
 
     .btn-logout {
@@ -463,14 +560,26 @@
         min-width: 0;
       }
 
-      .btn-profile,
+      .btn-profile {
+        display: inline-flex;
+        flex: 0 0 auto;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+        align-items: center;
+      }
+
       .btn-chat,
       .btn-logout {
         display: none;
       }
 
       .btn-profile-mobile {
-        display: inline-flex;
+        display: none;
       }
 
       .user-info {
@@ -666,19 +775,14 @@
         min-height: 40px;
       }
 
-      .btn-profile,
-      .btn-chat,
-      .btn-logout {
-        display: none;
+      .btn-profile {
+        display: inline-flex;
       }
 
+      .btn-chat,
+      .btn-logout,
       .btn-profile-mobile {
-        display: inline-flex;
-        padding: 8px 10px;
-        font-size: 16px;
-        min-height: 40px;
-        justify-content: center;
-        align-items: center;
+        display: none;
       }
 
       .search-bar input,
@@ -746,16 +850,27 @@
     <span class="user-info">Halo, <strong id="nama-user"></strong></span>
     <button class="btn-myposts" onclick="lihatPostinganSaya()">📦 Postingan Saya</button>
     <button class="btn-upload" onclick="bukaModalUpload()">+ Jual Sekarang</button>
-    <button class="btn-profile" onclick="window.location.href='/views/profile.html'">👤 Profil</button>
+    <button class="btn-profile" id="btn-profile" type="button" onclick="toggleProfileMenu()">👤</button>
     <button class="btn-chat" onclick="window.location.href='/views/chat.html'">💬 Chat</button>
     <button class="btn-logout" onclick="logout()">Keluar</button>
-    <div class="mobile-profile-wrapper">
-      <button class="btn-profile-mobile" id="btn-profile-mobile" type="button" onclick="toggleProfileMenu()">👤</button>
-      <div class="mobile-profile-menu" id="mobile-profile-menu">
-        <button onclick="window.location.href='/views/chat.html'">💬 Chat</button>
-        <button onclick="window.location.href='/views/profile.html'">✏️ Edit Profile</button>
-        <button onclick="logout()">⛔ Keluar</button>
+    <div class="profile-menu" id="profile-menu">
+      <button type="button" onclick="lihatWishlist()">💗 Wishlist</button>
+      <button type="button" onclick="lihatPostinganSaya()">📦 Postingan Saya</button>
+      <button type="button" onclick="window.location.href='/views/chat.html'">💬 Chat</button>
+      <button type="button" onclick="window.location.href='/views/profile.html'">✏️ Edit Profil</button>
+      <div class="menu-divider"></div>
+      <div class="menu-title">Sortir Harga</div>
+      <div class="menu-controls">
+        <select id="filter-sort">
+          <option value="terbaru">🕒 Terbaru</option>
+          <option value="termurah">💸 Termurah</option>
+          <option value="termahal">💰 Termahal</option>
+        </select>
+        <input type="number" id="filter-harga-min" placeholder="Harga min">
+        <input type="number" id="filter-harga-max" placeholder="Harga max">
+        <button type="button" onclick="cariPost()">Terapkan</button>
       </div>
+      <button type="button" class="logout-btn" onclick="logout()">⛔ Keluar</button>
     </div>
   </div>
 </nav>
@@ -863,6 +978,9 @@
 
   let kategoriAktif = 'semua';
   let searchAktif = '';
+  let sortAktif = 'terbaru';
+  let hargaMinAktif = '';
+  let hargaMaxAktif = '';
 
   // Load postingan
   async function loadPosts() {
@@ -871,9 +989,14 @@
 
     let url = `/api/posts?kategori=${kategoriAktif}`;
     if (searchAktif) url += `&search=${encodeURIComponent(searchAktif)}`;
+    if (sortAktif) url += `&sort=${encodeURIComponent(sortAktif)}`;
+    if (hargaMinAktif) url += `&harga_min=${encodeURIComponent(hargaMinAktif)}`;
+    if (hargaMaxAktif) url += `&harga_max=${encodeURIComponent(hargaMaxAktif)}`;
 
     try {
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       const posts = await res.json();
 
       if (posts.length === 0) {
@@ -896,6 +1019,10 @@
             <div class="post-judul">${post.judul}</div>
             <div class="post-harga">Rp ${Number(post.harga).toLocaleString('id-ID')}</div>
             <div class="post-penjual">👤 ${post.nama_penjual}</div>
+            <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#64748b">
+              <span>${post.status === 'sold' ? '✅ Terjual' : '📦 Tersedia'}</span>
+              <button type="button" onclick="event.stopPropagation();toggleWishlist(${post.id}, this)" style="border:none;background:${post.is_wishlist ? '#fef2f2' : '#f8fafc'};color:${post.is_wishlist ? '#dc2626' : '#64748b'};padding:4px 8px;border-radius:999px;cursor:pointer">${post.is_wishlist ? '💖' : '🤍'}</button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -917,6 +1044,9 @@
   // Search
   function cariPost() {
     searchAktif = document.getElementById('input-search').value;
+    sortAktif = document.getElementById('filter-sort').value;
+    hargaMinAktif = document.getElementById('filter-harga-min').value;
+    hargaMaxAktif = document.getElementById('filter-harga-max').value;
     loadPosts();
   }
 
@@ -1040,6 +1170,36 @@ if (post.penjual_id == userId) {
     bukaModal('modal-myposts');
   }
 
+  async function toggleWishlist(id, btn) {
+    const res = await fetch(`/api/posts/${id}/wishlist`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      btn.textContent = data.added ? '💖' : '🤍';
+      btn.style.background = data.added ? '#fef2f2' : '#f8fafc';
+      btn.style.color = data.added ? '#dc2626' : '#64748b';
+      alert(data.message);
+    }
+  }
+
+  async function lihatWishlist() {
+    const res = await fetch('/api/posts/wishlist', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const posts = await res.json();
+    const container = document.getElementById('myposts-container');
+    container.innerHTML = posts.length ? posts.map(post => `
+      <div style="padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px">
+        <div style="font-weight:600;color:#1e293b">${post.judul}</div>
+        <div style="font-size:13px;color:#64748b;margin-top:4px">Rp ${Number(post.harga).toLocaleString('id-ID')}</div>
+      </div>
+    `).join('') : '<div class="empty-state"><div class="icon">💗</div><div>Wishlist Anda masih kosong</div></div>';
+    bukaModal('modal-myposts');
+    document.querySelector('#modal-myposts .modal-header h2').textContent = '💗 Wishlist Saya';
+  }
+
   // Hapus post
   async function hapusPost(id) {
     if (!confirm('Yakin mau hapus postingan ini?')) return;
@@ -1107,11 +1267,11 @@ if (post.penjual_id == userId) {
   }
 
   function toggleProfileMenu() {
-    document.getElementById('mobile-profile-menu').classList.toggle('show');
+    document.getElementById('profile-menu').classList.toggle('show');
   }
 
   function closeProfileMenu() {
-    document.getElementById('mobile-profile-menu').classList.remove('show');
+    document.getElementById('profile-menu').classList.remove('show');
   }
 
   function logout() {
@@ -1126,10 +1286,10 @@ if (post.penjual_id == userId) {
     });
   });
 
-  // Tutup mobile profile menu kalau klik di luar
+  // Tutup profile menu kalau klik di luar
   document.addEventListener('click', e => {
-    const profileBtn = document.getElementById('btn-profile-mobile');
-    const menu = document.getElementById('mobile-profile-menu');
+    const profileBtn = document.getElementById('btn-profile');
+    const menu = document.getElementById('profile-menu');
     if (!menu || !profileBtn) return;
     if (!profileBtn.contains(e.target) && !menu.contains(e.target)) {
       menu.classList.remove('show');

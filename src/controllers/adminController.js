@@ -55,9 +55,45 @@ function hapusPost(req, res) {
 // Ambil semua user
 function semuaUser(req, res) {
   const users = db.prepare(`
-    SELECT id, nama, email, role, created_at FROM users ORDER BY created_at DESC
+    SELECT id, nama, email, role, banned, created_at FROM users ORDER BY created_at DESC
   `).all();
   res.json(users);
+}
+
+// Ban atau unban user
+function banUser(req, res) {
+  const userId = parseInt(req.params.id, 10);
+  if (req.user.id === userId) {
+    return res.status(400).json({ error: 'Admin tidak dapat memblokir diri sendiri' });
+  }
+
+  const user = db.prepare('SELECT id, banned FROM users WHERE id = ?').get(userId);
+  if (!user) return res.status(404).json({ error: 'User tidak ditemukan' });
+
+  const nextStatus = user.banned ? 0 : 1;
+  db.prepare('UPDATE users SET banned = ? WHERE id = ?').run(nextStatus, userId);
+  res.json({ message: user.banned ? 'User diizinkan kembali' : 'User diblokir', banned: nextStatus });
+}
+
+// Hapus akun user beserta data terkait
+function hapusUser(req, res) {
+  const userId = parseInt(req.params.id, 10);
+  if (req.user.id === userId) {
+    return res.status(400).json({ error: 'Admin tidak dapat menghapus dirinya sendiri' });
+  }
+
+  const user = db.prepare('SELECT id FROM users WHERE id = ?').get(userId);
+  if (!user) return res.status(404).json({ error: 'User tidak ditemukan' });
+
+  db.prepare('DELETE FROM messages WHERE sender_id = ? OR receiver_id = ?').run(userId, userId);
+  db.prepare('DELETE FROM notifications WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM chat_threads WHERE user1_id = ? OR user2_id = ? OR admin_id = ?').run(userId, userId, userId);
+  db.prepare('DELETE FROM ratings WHERE pembeli_id = ? OR penjual_id = ?').run(userId, userId);
+  db.prepare('DELETE FROM wishlists WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM posts WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+
+  res.json({ message: 'User dan semua data terkait telah dihapus' });
 }
 
 // Statistik dashboard
@@ -85,4 +121,4 @@ function notifikasi(req, res) {
   res.json(notifs);
 }
 
-module.exports = { semuaPost, approvePost, rejectPost, hapusPost, semuaUser, statistik, notifikasi };
+module.exports = { semuaPost, approvePost, rejectPost, hapusPost, semuaUser, banUser, hapusUser, statistik, notifikasi };

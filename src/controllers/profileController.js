@@ -21,6 +21,9 @@ function getProfile(req, res) {
       FROM posts WHERE user_id = ?
     `).get(userId);
 
+    const wishlistCount = db.prepare('SELECT COUNT(*) as total FROM wishlists WHERE user_id = ?').get(userId).total;
+    const reviewsCount = db.prepare('SELECT COUNT(*) as total FROM ratings WHERE penjual_id = ?').get(userId).total;
+
     // Ambil semua postingan user
     const posts = db.prepare(`
       SELECT id, judul, deskripsi, harga, kategori, foto, status, created_at
@@ -40,7 +43,9 @@ function getProfile(req, res) {
       stats: {
         total_posts: stats.total_posts || 0,
         approved: stats.approved || 0,
-        sold: stats.sold || 0
+        sold: stats.sold || 0,
+        wishlist: wishlistCount || 0,
+        reviews: reviewsCount || 0
       },
       posts: posts
     });
@@ -65,6 +70,9 @@ function getProfileById(req, res) {
       FROM posts WHERE user_id = ?
     `).get(userId);
 
+    const wishlistCount = db.prepare('SELECT COUNT(*) as total FROM wishlists WHERE user_id = ?').get(userId).total;
+    const reviewsCount = db.prepare('SELECT COUNT(*) as total FROM ratings WHERE penjual_id = ?').get(userId).total;
+
     const posts = db.prepare(`
       SELECT id, judul, deskripsi, harga, kategori, foto, status, created_at
       FROM posts WHERE user_id = ? AND status = 'approved'
@@ -83,7 +91,9 @@ function getProfileById(req, res) {
       stats: {
         total_posts: stats.total_posts || 0,
         approved: stats.approved || 0,
-        sold: stats.sold || 0
+        sold: stats.sold || 0,
+        wishlist: wishlistCount || 0,
+        reviews: reviewsCount || 0
       },
       posts: posts
     });

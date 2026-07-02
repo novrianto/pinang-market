@@ -97,12 +97,27 @@ db.exec(`
     FOREIGN KEY (pembeli_id) REFERENCES users(id),
     FOREIGN KEY (penjual_id) REFERENCES users(id)
   );
+
+  CREATE TABLE IF NOT EXISTS wishlists (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    post_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, post_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (post_id) REFERENCES posts(id)
+  );
   
 `);
 
 const messageColumns = db.prepare("PRAGMA table_info(messages)").all().map(c => c.name);
 if (!messageColumns.includes('chat_id')) {
   db.prepare('ALTER TABLE messages ADD COLUMN chat_id INTEGER').run();
+}
+
+const userColumns = db.prepare("PRAGMA table_info(users)").all().map(c => c.name);
+if (!userColumns.includes('banned')) {
+  db.prepare('ALTER TABLE users ADD COLUMN banned INTEGER DEFAULT 0').run();
 }
 
 // Buat akun admin default kalau belum ada

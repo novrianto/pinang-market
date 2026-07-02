@@ -41,6 +41,10 @@ function login(req, res) {
   if (!user)
     return res.status(400).json({ error: 'Email tidak ditemukan' });
 
+  if (user.banned) {
+    return res.status(403).json({ error: 'Akun Anda diblokir. Hubungi admin.' });
+  }
+
   const cocok = bcrypt.compareSync(password, user.password);
   if (!cocok)
     return res.status(400).json({ error: 'Password salah' });

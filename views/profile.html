@@ -275,6 +275,8 @@
         <div class="stat-box"><span>Total Postingan</span><strong id="totalPosts">0</strong></div>
         <div class="stat-box"><span>Disetujui</span><strong id="approvedPosts">0</strong></div>
         <div class="stat-box"><span>Terjual</span><strong id="soldPosts">0</strong></div>
+        <div class="stat-box"><span>Wishlist</span><strong id="wishlistCount">0</strong></div>
+        <div class="stat-box"><span>Review</span><strong id="reviewCount">0</strong></div>
       </div>
     </section>
 
@@ -358,6 +360,8 @@
         document.getElementById('totalPosts').textContent = data.stats?.total_posts || 0;
         document.getElementById('approvedPosts').textContent = data.stats?.approved || 0;
         document.getElementById('soldPosts').textContent = data.stats?.sold || 0;
+        document.getElementById('wishlistCount').textContent = data.stats?.wishlist || 0;
+        document.getElementById('reviewCount').textContent = data.stats?.reviews || 0;
 
         const avatarBox = document.getElementById('avatarBox');
         if (data.user?.foto_profil) {
@@ -381,11 +385,27 @@
               <p>${post.kategori}</p>
               <p><strong>Rp ${Number(post.harga).toLocaleString('id-ID')}</strong></p>
               <p style="font-size:12px;">${post.status}</p>
+              ${isOwnProfile ? `<button onclick="markAsSold(${post.id})" style="margin-top:8px;padding:6px 10px;border:none;border-radius:8px;background:#f0fdf4;color:#16a34a;cursor:pointer">Tandai Terjual</button>` : ''}
             </div>
           </div>
         `).join('');
       } catch (err) {
         document.getElementById('postsList').innerHTML = `<div class="empty">${err.message}</div>`;
+      }
+    }
+
+    async function markAsSold(postId) {
+      try {
+        const res = await fetch(`/api/posts/${postId}/sold`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Gagal memperbarui status');
+        alert(data.message || 'Status berhasil diubah');
+        loadProfile();
+      } catch (err) {
+        alert(err.message);
       }
     }
 

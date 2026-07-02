@@ -1,32 +1,23 @@
 const db = require('../database');
 const path = require('path');
 const fs = require('fs');
+const { buildPostListQuery } = require('../utils/postQuery');
 
 // Ambil semua postingan yang sudah approved (untuk halaman home)
 function getAllPosts(req, res) {
-  const { search, kategori } = req.query;
-  let query = `
-    SELECT posts.*, users.nama as nama_penjual
-    FROM posts
-    JOIN users ON posts.user_id = users.id
-    WHERE posts.status = 'approved'
-  `;
-  const params = [];
-
-  if (search) {
-    query += ` AND (posts.judul LIKE ? OR posts.deskripsi LIKE ?)`;
-    params.push(`%${search}%`, `%${search}%`);
-  }
-
-  if (kategori && kategori !== 'semua') {
-    query += ` AND posts.kategori = ?`;
-    params.push(kategori);
-  }
-
-  query += ` ORDER BY posts.created_at DESC`;
-
+  const { search, kategori, sort, harga_min, harga_max } = req.query;
+  const { query, params } = buildPostListQuery({ search, kategori, sort, harga_min, harga_max });
   const posts = db.prepare(query).all(...params);
-  res.json(posts);
+
+  if (req.user) {
+    const wishlisted = new Set(
+      db.prepare('SELECT post_id FROM wishlists WHERE user_id = ?').all(req.user.id).map(item => item.post_id)
+    );
+    const enriched = posts.map(post => ({ ...post, is_wishlist: wishlisted.has(post.id) }));
+    return res.json(enriched);
+  }
+
+  res.json(posts.map(post => ({ ...post, is_wishlist: false })));
 }
 
 // Ambil postingan milik user yang login
@@ -47,7 +38,12 @@ function getPostById(req, res) {
   `).get(req.params.id);
 
   if (!post) return res.status(404).json({ error: 'Postingan tidak ditemukan' });
-  res.json(post);
+
+  const isWishlist = req.user
+    ? !!db.prepare('SELECT 1 FROM wishlists WHERE user_id = ? AND post_id = ?').get(req.user.id, post.id)
+    : false;
+
+  res.json({ ...post, is_wishlist: isWishlist });
 }
 
 // Upload postingan baru
@@ -93,4 +89,49 @@ function deletePost(req, res) {
   res.json({ message: 'Postingan berhasil dihapus' });
 }
 
-module.exports = { getAllPosts, getMyPosts, getPostById, createPost, deletePost };
+function getWishlist(req, res) {
+  const posts = db.prepare(`
+    SELECT p.*, u.nama as nama_penjual
+    FROM wishlists w
+    JOIN posts p ON w.post_id = p.id
+    JOIN users u ON p.user_id = u.id
+    WHERE w.user_id = ?
+    ORDER BY w.created_at DESC
+  `).all(req.user.id);
+
+  res.json(posts);
+}
+
+function toggleWishlist(req, res) {
+  const { id } = req.params;
+  const existing = db.prepare('SELECT * FROM wishlists WHERE user_id = ? AND post_id = ?').get(req.user.id, id);
+
+  if (existing) {
+    db.prepare('DELETE FROM wishlists WHERE id = ?').run(existing.id);
+    return res.json({ message: 'Dihapus dari wishlist', added: false });
+  }
+
+  db.prepare('INSERT INTO wishlists (user_id, post_id) VALUES (?, ?)').run(req.user.id, id);
+  res.json({ message: 'Ditambahkan ke wishlist', added: true });
+}
+
+function markPostAsSold(req, res) {
+  const { id } = req.params;
+  const post = db.prepare('SELECT * FROM posts WHERE id = ? AND user_id = ?').get(id, req.user.id);
+
+  if (!post) return res.status(404).json({ error: 'Postingan tidak ditemukan' });
+
+  db.prepare("UPDATE posts SET status = 'sold' WHERE id = ?").run(id);
+  res.json({ message: 'Status postingan diubah menjadi terjual' });
+}
+
+module.exports = {
+  getAllPosts,
+  getMyPosts,
+  getPostById,
+  createPost,
+  deletePost,
+  getWishlist,
+  toggleWishlist,
+  markPostAsSold
+};
